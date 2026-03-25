@@ -344,7 +344,43 @@
 
                 alert("Liste erfolgreich aktualisiert!");
             } catch (err) {
-                alert("Fehler: " + err.message);
+                console.error("Detaillierter Fehler:", err);
+                alert("Fehler beim Laden: " + err.message + "\nPfad: " + filePath);
+            }
+        }
+
+        function processCsvContent(content) {
+            if (!content || content.trim() === "") {
+                throw new Error("Die Datei ist leer.");
+            }
+
+            const lines = content.split('\n');
+            // Wir filtern leere Zeilen und teilen am Semikolon
+            const vocabulary = lines
+                .map(line => line.split(';'))
+                .filter(parts => parts.length === 2)
+                .map(parts => ({
+                    de: parts[0].trim(),
+                    en: parts[1].trim()
+                }));
+
+            if (vocabulary.length === 0) {
+                throw new Error("Keine gültigen Vokabeln gefunden (Format: Wort;Übersetzung)");
+            }
+
+            // Speichern im LocalStorage für Offline-Nutzung
+            localStorage.setItem('myVocabulary', JSON.stringify(vocabulary));
+
+            // Global verfügbare Variable aktualisieren (falls vorhanden)
+            if (typeof originalVocabulary !== 'undefined') {
+                originalVocabulary = vocabulary;
+            }
+
+            console.log(`${vocabulary.length} Vokabeln erfolgreich verarbeitet.`);
+
+            // Falls du eine Funktion hast, die das UI aktualisiert (z.B. Kartenzahl):
+            if (typeof updateStatusDisplay === 'function') {
+                updateStatusDisplay();
             }
         }
 
