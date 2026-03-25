@@ -1,0 +1,16 @@
+{
+  "name": "Vokabel-Trainer Pro",
+  "short_name": "Vokabeln",
+  "start_url": "vokabeltrainer.html",
+  "display": "standalone",
+  "background_color": "#f0f2f5",
+  "theme_color": "#007bff",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3426/3426230.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

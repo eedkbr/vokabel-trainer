@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#007bff">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3426/3426230.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vokabel-Trainer Pro</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f0f2f5;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            box-sizing: border-box;
+            position: relative;
+            min-height: 400px;
+        }
+
+        .setup-section {
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        select,
+        input[type="file"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0 15px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        #file-status {
+            font-size: 0.85em;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        h1 {
+            color: #007bff;
+            margin: 15px 0;
+            font-size: 1.8em;
+            min-height: 1.2em;
+            word-wrap: break-word;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 18px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .btn {
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .btn-check {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-start {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-override {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .btn-skip {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        #status-bar {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            border: 1px solid #eee;
+        }
+
+        .correct {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .wrong {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #result-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <div id="setup">
+            <div class="setup-section">
+                <label>1. Datei laden (.csv):</label>
+                <input type="file" id="file-input" accept=".csv">
+                <div id="file-status">Lade eine Datei hoch...</div>
+                <label>2. Richtung:</label>
+                <select id="direction">
+                    <option value="de-en">Deutsch -> Fremdsprache</option>
+                    <option value="en-de">Fremdsprache -> Deutsch</option>
+                </select>
+                <label>3. Wörter pro Runde:</label>
+                <input type="number" id="session-limit" value="20" min="1">
+                <button class="btn btn-start" onclick="initQuiz()">Quiz starten</button>
+            </div>
+        </div>
+
+        <div id="quiz-area" class="hidden">
+            <div id="status-bar">
+                Fortschritt: <span id="current-index">0</span> / <span id="total-count">0</span><br>
+                <span class="correct">Richtig: <span id="score-correct">0</span></span> |
+                <span class="wrong">Falsch/Skip: <span id="score-wrong">0</span></span>
+            </div>
+            <p style="color: #666; margin-bottom: 5px;">Übersetze:</p>
+            <h1 id="display-word">...</h1>
+            <input type="text" id="user-answer" placeholder="Deine Antwort..." autocomplete="off">
+            <button class="btn btn-check" onclick="checkAnswer()">Prüfen</button>
+            <button id="override-btn" class="btn btn-override hidden" onclick="forceCorrect()">War doch richtig!
+                (+1)</button>
+            <button class="btn btn-skip" onclick="skipQuestion()">Überspringen</button>
+            <div id="feedback" style="margin: 15px 0; min-height: 1.5em; font-weight: bold;"></div>
+            <button style="background:none; border:none; color:#bbb; cursor:pointer; font-size: 0.8em;"
+                onclick="exitQuiz()">← Abbrechen</button>
+        </div>
+
+        <div id="result-overlay" class="hidden">
+            <h2 style="color: #007bff;">Runde beendet!</h2>
+            <div style="font-size: 1.2em; margin-bottom: 20px;">
+                <p>Gesamt: <b id="res-total">0</b></p>
+                <p class="correct">Richtig: <b id="res-correct">0</b></p>
+                <p class="wrong">Falsch: <b id="res-wrong">0</b></p>
+            </div>
+            <button class="btn btn-start" onclick="exitQuiz()">Zurück zum Start</button>
+        </div>
+    </div>
+
+    <script>
+        let originalVocabulary = [], shuffledStack = [], currentPair;
+        let correctCount = 0, totalCount = 0, completedInRound = 0, hasChecked = false;
+
+        window.onload = function () {
+            const saved = localStorage.getItem('myVocabulary');
+            if (saved) {
+                originalVocabulary = JSON.parse(saved);
+                document.getElementById('file-status').innerText = `Bereit: ${originalVocabulary.length} Wörter im Speicher.`;
+                document.getElementById('file-status').style.color = "#28a745";
+            }
+        };
+
+        document.getElementById('file-input').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const lines = event.target.result.split('\n');
+                originalVocabulary = lines.map(line => line.split(';')).filter(p => p.length === 2).map(p => ({ de: p[0].trim(), en: p[1].trim() }));
+                if (originalVocabulary.length > 0) {
+                    localStorage.setItem('myVocabulary', JSON.stringify(originalVocabulary));
+                    const s = document.getElementById('file-status');
+                    s.innerText = `Bereit: ${originalVocabulary.length} Wörter geladen.`;
+                    s.style.color = "#28a745";
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function initQuiz() {
+            if (originalVocabulary.length === 0) return alert("Keine Wörter!");
+
+            // WICHTIG: Alle Overlays verstecken
+            document.getElementById('result-overlay').classList.add('hidden');
+            document.getElementById('setup').classList.add('hidden');
+            document.getElementById('quiz-area').classList.remove('hidden');
+
+            let limit = parseInt(document.getElementById('session-limit').value) || 20;
+            shuffledStack = [...originalVocabulary].sort(() => 0.5 - Math.random()).slice(0, limit);
+
+            totalCount = shuffledStack.length;
+            correctCount = 0;
+            completedInRound = 0;
+            nextQuestion();
+        }
+
+        function refreshScoreDisplay() {
+            document.getElementById('current-index').innerText = Math.min(totalCount, completedInRound + 1);
+            document.getElementById('total-count').innerText = totalCount;
+            document.getElementById('score-correct').innerText = correctCount;
+            document.getElementById('score-wrong').innerText = completedInRound - correctCount;
+        }
+
+        function nextQuestion() {
+            if (shuffledStack.length === 0) {
+                document.getElementById('res-total').innerText = totalCount;
+                document.getElementById('res-correct').innerText = correctCount;
+                document.getElementById('res-wrong').innerText = totalCount - correctCount;
+                document.getElementById('quiz-area').classList.add('hidden');
+                document.getElementById('result-overlay').classList.remove('hidden');
+                return;
+            }
+            currentPair = shuffledStack.pop();
+            hasChecked = false;
+            const dir = document.getElementById('direction').value;
+            document.getElementById('display-word').innerText = (dir === 'de-en') ? currentPair.de : currentPair.en;
+            document.getElementById('user-answer').value = "";
+            document.getElementById('feedback').innerText = "";
+            document.getElementById('override-btn').classList.add('hidden');
+            refreshScoreDisplay();
+            setTimeout(() => document.getElementById('user-answer').focus(), 100);
+        }
+
+        function checkAnswer() {
+            if (hasChecked) return;
+            hasChecked = true;
+            completedInRound++;
+
+            const dir = document.getElementById('direction').value;
+            const input = document.getElementById('user-answer').value.trim().toLowerCase();
+            const solution = (dir === 'de-en') ? currentPair.en : currentPair.de;
+            const alts = solution.split(/[/,;]/).map(s => s.trim().toLowerCase());
+
+            if (alts.includes(input)) {
+                document.getElementById('feedback').innerText = "Richtig! ✨";
+                document.getElementById('feedback').className = "correct";
+                correctCount++;
+                refreshScoreDisplay();
+                setTimeout(nextQuestion, 1000);
+            } else {
+                document.getElementById('feedback').innerHTML = `Lösung: <br><strong>${solution}</strong>`;
+                document.getElementById('feedback').className = "wrong";
+                document.getElementById('override-btn').classList.remove('hidden');
+                refreshScoreDisplay();
+            }
+        }
+
+        function forceCorrect() {
+            correctCount++;
+            refreshScoreDisplay();
+            nextQuestion();
+        }
+
+        function skipQuestion() {
+            if (!hasChecked) {
+                completedInRound++;
+                refreshScoreDisplay();
+            }
+            nextQuestion();
+        }
+
+        function exitQuiz() {
+            document.getElementById('result-overlay').classList.add('hidden');
+            document.getElementById('quiz-area').classList.add('hidden');
+            document.getElementById('setup').classList.remove('hidden');
+            document.getElementById('file-input').value = "";
+        }
+
+        document.getElementById('user-answer').addEventListener('keydown', (e) => { if (e.key === 'Enter') checkAnswer(); });
+    </script>
+</body>
+
+</html>
