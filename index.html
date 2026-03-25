@@ -61,12 +61,6 @@
             font-size: 16px;
         }
 
-        #file-status {
-            font-size: 0.85em;
-            margin-top: -10px;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
 
         h1 {
             color: #007bff;
@@ -82,7 +76,7 @@
             margin: 10px 0;
             border: 2px solid #ddd;
             border-radius: 10px;
-            font-size: 18px;
+            font-size: 20px;
             box-sizing: border-box;
             outline: none;
         }
@@ -223,27 +217,8 @@
             const saved = localStorage.getItem('myVocabulary');
             if (saved) {
                 originalVocabulary = JSON.parse(saved);
-             //   document.getElementById('file-status').innerText = `Bereit: ${originalVocabulary.length} Wörter im Speicher.`;
-             //   document.getElementById('file-status').style.color = "#28a745";
             }
         };
-
-       /*document.getElementById('file-input').addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function (event) {
-                const lines = event.target.result.split('\n');
-                originalVocabulary = lines.map(line => line.split(';')).filter(p => p.length === 2).map(p => ({ de: p[0].trim(), en: p[1].trim() }));
-                if (originalVocabulary.length > 0) {
-                    localStorage.setItem('myVocabulary', JSON.stringify(originalVocabulary));
-                    const s = document.getElementById('file-status');
-                    s.innerText = `Bereit: ${originalVocabulary.length} Wörter geladen.`;
-                    s.style.color = "#28a745";
-                }
-            };
-            reader.readAsText(file);
-        });*/
 
         function initQuiz() {
             if (originalVocabulary.length === 0) return alert("Keine Wörter!");
@@ -331,7 +306,6 @@
             document.getElementById('result-overlay').classList.add('hidden');
             document.getElementById('quiz-area').classList.add('hidden');
             document.getElementById('setup').classList.remove('hidden');
-           // document.getElementById('file-input').value = "";
         }
 
         async function loadSelectedList() {
