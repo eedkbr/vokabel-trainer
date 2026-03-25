@@ -164,9 +164,14 @@
     <div class="card">
         <div id="setup">
             <div class="setup-section">
-                <label>1. Datei laden (.csv):</label>
-                <input type="file" id="file-input" accept=".csv">
-                <div id="file-status">Lade eine Datei hoch...</div>
+                <label for="language-select">Vokabel-Liste wählen:</label>
+                <select id="language-select" onchange="loadSelectedList()">
+                    <option value="">-- Bitte wählen --</option>
+                    <option value="/lists/englisch.csv">Englisch (Duolingo)</option>
+                    <option value="/lists/spanisch.csv">Spanisch (Basis)</option>
+                    <option value="/lists/franzoesisch.csv">Französisch</option>
+                </select>
+                <button class="btn btn-start" onclick="loadSelectedList()">Laden</button>
                 <label>2. Richtung:</label>
                 <select id="direction">
                     <option value="de-en">Deutsch -> Fremdsprache</option>
@@ -325,6 +330,24 @@
             document.getElementById('setup').classList.remove('hidden');
             document.getElementById('file-input').value = "";
         }
+
+        async function loadSelectedList() {
+            const filePath = document.getElementById('language-select').value;
+            if (!filePath) return;
+
+            try {
+                const response = await fetch(filePath); // Holt die Datei vom Server
+                if (!response.ok) throw new Error("Datei nicht gefunden");
+
+                const content = await response.text();
+                processCsvContent(content); // Deine Funktion, die die CSV zerlegt
+
+                alert("Liste erfolgreich aktualisiert!");
+            } catch (err) {
+                alert("Fehler: " + err.message);
+            }
+        }
+
 
         document.getElementById('user-answer').addEventListener('keydown', (e) => { if (e.key === 'Enter') checkAnswer(); });
     </script>
