@@ -228,7 +228,7 @@
             }
         };
 
-        document.getElementById('file-input').addEventListener('change', function (e) {
+       /*document.getElementById('file-input').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -243,7 +243,7 @@
                 }
             };
             reader.readAsText(file);
-        });
+        });*/
 
         function initQuiz() {
             if (originalVocabulary.length === 0) return alert("Keine Wörter!");
@@ -331,7 +331,7 @@
             document.getElementById('result-overlay').classList.add('hidden');
             document.getElementById('quiz-area').classList.add('hidden');
             document.getElementById('setup').classList.remove('hidden');
-            document.getElementById('file-input').value = "";
+           // document.getElementById('file-input').value = "";
         }
 
         async function loadSelectedList() {
