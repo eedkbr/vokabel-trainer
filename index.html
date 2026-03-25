@@ -328,6 +328,11 @@
 
         document.getElementById('user-answer').addEventListener('keydown', (e) => { if (e.key === 'Enter') checkAnswer(); });
     </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
 </body>
 
 </html>
