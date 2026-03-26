@@ -3,7 +3,7 @@ const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './lists/vokabeln.csv' // Hier fügen wir deine Liste hinzu!
+  './lists/spanisch.csv' // Hier fügen wir deine Liste hinzu!
 ];
 
 // 1. Installation: Dateien in den Cache laden
