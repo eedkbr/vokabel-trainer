@@ -161,16 +161,17 @@
     <div class="card">
         <div id="setup">
             <div class="setup-section">
-                <label for="language-select">Vokabel-Liste wählen:</label>
+                <label for="language-select">1. Vokabel-Liste wählen:</label>
                 <select id="language-select" onchange="loadSelectedList()">
                     <option value="">-- Bitte wählen --</option>
+                    <option value="lists/EnglischGrundwortschatz.csv">Englisch Grundwortschatz[1681]</option>
                     <option value="lists/spanisch.csv">Spanisch (Duolingo)</option>
                     <option value="lists/Ear.csv">Spanische Verben (-ar)</option>
                     <option value="lists/Eir.csv">Spanische Verben (-er)</option>
                     <option value="lists/Eer.csv">Spanische Verben (-ir)</option>
                     <option value="lists/franzoesisch.csv">Französisch</option>
                 </select>
-                <button class="btn btn-start" onclick="loadSelectedList()">Laden</button>
+               <!-- <button class="btn btn-start" onclick="loadSelectedList()">Laden</button> -->
                 <label>2. Richtung:</label>
                 <select id="direction">
                     <option value="de-en">Deutsch -> Fremdsprache</option>
